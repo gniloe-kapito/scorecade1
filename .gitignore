@@ -1,0 +1,30 @@
+# Зависимости
+node_modules/
+
+# Сборка Next.js
+.next/
+out/
+open-next/
+.open-next/
+.worker/
+next-env.d.ts
+
+# Локальная база данных (тестовые данные — на сервере своя)
+db/*.db
+db/*.db-journal
+
+# Логи
+dev.log
+*.log
+
+# Служебное
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+
+# Кэш
+.cache/
+.turbo/
+coverage/
