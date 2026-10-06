@@ -1,0 +1,90 @@
+// Scorecade database schema (adapted from the spec's worker/schema.sql)
+// SQLite + Prisma. Ints are epoch milliseconds.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String
+  // Lowercased copy for case-insensitive unique lookup and login
+  usernameLower String    @unique
+  passwordHash  String
+  passwordSalt  String
+  // Profile pictures hosted on kappa.lol (uploaded through our server).
+  // *Url is the public link, *Key is the kappa.lol deletion key used to
+  // clean up the old file when the picture is replaced or removed.
+  avatarUrl     String?
+  avatarKey     String?
+  bannerUrl     String?
+  bannerKey     String?
+  createdAt     DateTime  @default(now())
+  sessions      Session[]
+  ratings       Rating[]
+  statuses      GameStatus[]
+  givenFollows  Follow[]  @relation("follower")
+  receivedFollows Follow[] @relation("following")
+
+  @@index([usernameLower])
+}
+
+model Session {
+  tokenHash String   @id
+  userId    Int
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Rating {
+  userId    Int
+  gameId    String // e.g. 'steam:730'
+  gameName  String
+  gameCover String?
+  score     Int // 0..10
+  review    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, gameId])
+  @@index([userId, score])
+  @@index([gameId])
+  @@index([updatedAt])
+}
+
+model Follow {
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+  follower    User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+// «Играл» / «Хочу поиграть» status. No row = «Не играл» (default).
+// Setting a rating automatically upserts status='played' (see ratings route).
+model GameStatus {
+  userId    Int
+  gameId    String // e.g. 'steam:730'
+  status    String // 'played' | 'want'
+  gameName  String
+  gameCover String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, gameId])
+  @@index([gameId])
+  @@index([userId, status])
+  @@index([updatedAt])
+}
