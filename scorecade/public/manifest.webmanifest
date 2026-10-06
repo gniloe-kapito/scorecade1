@@ -1,0 +1,26 @@
+{
+  "name": "Scorecade — оценки игр из Steam",
+  "short_name": "Scorecade",
+  "description": "Оценивайте игры из Steam на «колесе» от 0 до 10 и следите за оценками друзей.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1411",
+  "theme_color": "#0d1411",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
