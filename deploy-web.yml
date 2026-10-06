@@ -1,0 +1,27 @@
+# Автопроверка кода Scorecade при каждом push на GitHub.
+# Файл уже встроен в проект: .github/workflows/deploy-web.yml
+# (здесь лежит запасная копия для справки).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Проверка кода (ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Установка зависимостей
+        run: bun install --frozen-lockfile
+
+      - name: Линт
+        run: bun run lint
